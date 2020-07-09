@@ -26,6 +26,7 @@
         <encoding>UTF-8</encoding>
         <spark.version>2.1.1</spark.version>
         <scala.version>2.11.8</scala.version>
+	    <dependency-check-maven.version>5.3.0</dependency-check-maven.version>
         <scala.compat.version>2.11</scala.compat.version>
     </properties>
 
@@ -50,6 +51,13 @@
             <version>${spark.version}</version>
             <scope>provided</scope>
         </dependency>
+	    <!-- https://mvnrepository.com/artifact/org.webjars/jquery -->
+<dependency>
+    <groupId>org.webjars</groupId>
+    <artifactId>jquery</artifactId>
+    <version>2.2.4</version>
+</dependency>
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -87,6 +95,19 @@
         <sourceDirectory>src/main/scala</sourceDirectory>
 	<testSourceDirectory>src/test/scala</testSourceDirectory>
         <plugins>
+		        <plugin>
+          <groupId>org.owasp</groupId>
+          <artifactId>dependency-check-maven</artifactId>
+          <version>${dependency-check-maven.version}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
             <plugin>
                 <!-- see http://davidb.github.com/scala-maven-plugin -->
                 <groupId>net.alchim31.maven</groupId>
