@@ -1,266 +1,1074 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>net.martinprobson.spark</groupId>
-    <artifactId>spark_example</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <name>${project.artifactId}</name>
-    <description>Example Scala Spark App - Maven build
-        This POM has two exec goals: -
-        exec:exec@run-local - Run the code in spark local mode.
-        exec:exec@run-yarn - Run the code on yarn cluster in client mode. For this to work core-site.xml and
-        yarn-site.xml
-        must exist in the main/resources directory and point to a valid cluster.
-    </description>
-    <inceptionYear>2017</inceptionYear>
-    <repositories>
-        <repository>
-            <id>artima</id>
-            <name>Artima Maven Repository</name>
-            <url>http://repo.artima.com/releases</url>
-        </repository>
-    </repositories>
-    <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <encoding>UTF-8</encoding>
-        <spark.version>1.6.0</spark.version>
-        <scala.version>2.13.3</scala.version>
-	    <dependency-check-maven.version>5.3.2</dependency-check-maven.version>
-        <scala.compat.version>2.11</scala.compat.version>
-    </properties>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
+  <groupId>com.schedule1.datapassports</groupId>
+  <artifactId>datapassports</artifactId>
+  <version>1.5.4-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>DataPassports</name>
+  <url>https://github.com/schedule1/datapassport</url>
+
+  <modules>
+    <module>common</module>
+
+    <module>core</module>
+    <module>spark</module>
+    <module>generator</module>
+    <module>thriftserver</module>
+    <module>assembly</module>
+    <module>acceptance</module>
+  </modules>
+
+  <properties>
+    <platform>vanilla</platform>
+    <platform.suffix/>
+
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <java.version>1.8</java.version>
+
+    <scala.version>2.11.12</scala.version>
+    <scala.binary.version>2.11</scala.binary.version>
+
+    <spark.version>2.4.4</spark.version>
+    <spark.binary.version>2.4</spark.binary.version>
+    <spark.scope>provided</spark.scope>
+
+    <akkaVersion>2.5.9</akkaVersion>
+    <!--    <akkaHttpVersion>10.0.11</akkaHttpVersion>-->
+
+    <spookystuff.version>0.6.1_${scala.binary.version}-SNAPSHOT</spookystuff.version>
+
+    <json4s.version>3.5.3</json4s.version>
+
+    <hive.group>org.spark-project.hive</hive.group>
+    <hive.version>1.2.1.spark2</hive.version>
+    <hive.version.short>1.2.1</hive.version.short>
+
+    <ibmjce.version>8.0-5.30</ibmjce.version>
+
+    <factorie.version>1.3-master-20180316</factorie.version>
+    <factorie.model.version>1.3-SNAPSHOT</factorie.model.version>
+
+    <cdh.suffix>UNDEFINED</cdh.suffix>
+    <!--  the hive one picked up gy CDH5.14.2.p0.3 -->
+    <cdh.hive.version>1.1.0-cdh5.12.0</cdh.hive.version>
+
+    <aws-sdk.version>1.11.646</aws-sdk.version>
+
+    <assembly.suffix>spark${spark.binary.version}${platform.suffix}-scala${scala.binary.version}</assembly.suffix>
+    <assembly.jar.dir>scala-${scala.binary.version}</assembly.jar.dir>
+    <assembly.jar.basename>${project.artifactId}-${project.version}.jar</assembly.jar.basename>
+    <staging.jar.basename>${assembly.jar.basename}</staging.jar.basename>
+    <assembly.file>src/main/assembly/assembly.xml</assembly.file>
+
+    <maven.deploy.skip>true</maven.deploy.skip>
+  </properties>
+
+  <profiles>
+    <profile>
+      <id>java8</id>
+      <activation>
+        <jdk>1.8</jdk>
+      </activation>
+    </profile>
+
+    <profile>
+      <id>spark-2.4</id>
+
+      <modules>
+        <module>dependency/preload</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>scala-2.12</id>
+
+      <properties>
+
+        <scala.version>2.12.10</scala.version>
+        <scala.binary.version>2.12</scala.binary.version>
+      </properties>
+
+      <modules>
+        <module>dependency/preload</module>
+      </modules>
+    </profile>
+
+    <!--    <profile>-->
+    <!--      <id>spark-2.2</id>-->
+
+    <!--      <modules>-->
+    <!--        <module>dependency/preload</module>-->
+    <!--      </modules>-->
+    <!--    </profile>-->
+
+    <!--    <profile>-->
+    <!--      <id>spark-2.2-cloudera2</id>-->
+
+    <!--      <properties>-->
+    <!--        <cdh.suffix>cloudera2</cdh.suffix>-->
+    <!--        <platform.suffix>-${cdh.suffix}</platform.suffix>-->
+
+    <!--        <assembly.version>${spark.binary.version}${platform.suffix}</assembly.version>-->
+    <!--        <spark.version>2.2.0.${cdh.suffix}</spark.version>-->
+    <!--        <hive.group>org.apache.hive</hive.group>-->
+    <!--        <hive.version>${cdh.hive.version}</hive.version>-->
+    <!--        <hive.version.short>1.1.0</hive.version.short>-->
+    <!--      </properties>-->
+
+    <!--      <modules>-->
+    <!--        <module>dependency/preload-cloudera2</module>-->
+    <!--      </modules>-->
+
+    <!--    </profile>-->
+
+
+    <profile>
+      <id>benchmark</id>
+
+      <modules>
+        <module>benchmark</module>
+      </modules>
+
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+    </profile>
+
+
+    <profile>
+      <id>jdbc-driver</id>
+
+      <modules>
+        <module>jdbc-driver</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>include-spark</id>
+      <properties>
+        <spark.scope>compile</spark.scope>
+      </properties>
+    </profile>
+
+  </profiles>
+
+  <distributionManagement>
+    <repository>
+      <id>dp-artifactory-main</id>
+      <name>ip-172-31-9-93.us-west-2.compute.internal-releases</name>
+      <url>http://172.31.9.93:8081/artifactory/maven-staging-local</url>
+    </repository>
+    <snapshotRepository>
+      <id>dp-artifactory-snapshots</id>
+      <name>ip-172-31-9-93.us-west-2.compute.internal-snapshots</name>
+      <url>http://172.31.9.93:8081/artifactory/maven-staging-local</url>
+    </snapshotRepository>
+  </distributionManagement>
+
+  <repositories>
+    <repository>
+      <id>apache-repo</id>
+      <name>Apache Repository</name>
+      <url>https://repository.apache.org/content/repositories/releases</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>typesafe</id>
+      <name>typesafe - releases</name>
+      <url>http://repo.typesafe.com/typesafe/releases/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+
+    <repository>
+      <id>typesafe-ivy</id>
+      <name>Typesafe - ivy - releases</name>
+      <url>http://repo.typesafe.com/typesafe/maven-ivy-releases/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <!--    <repository>-->
+    <!--      <id>oss.sonatype.org</id>-->
+    <!--      <name>sonatype snapshots</name>-->
+    <!--      <url>https://oss.sonatype.org/content/repositories/snapshots</url>-->
+    <!--    </repository>-->
+
+    <repository>
+      <id>cloudera</id>
+      <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
+    </repository>
+
+    <!--<repository>-->
+    <!--<id>DataNucleus_Repos2</id>-->
+    <!--<name>DataNucleus Repository</name>-->
+    <!--<url>http://www.datanucleus.org/downloads/maven2</url>-->
+    <!--<releases>-->
+    <!--<enabled>true</enabled>-->
+    <!--</releases>-->
+    <!--<snapshots>-->
+    <!--<enabled>false</enabled>-->
+    <!--</snapshots>-->
+    <!--</repository>-->
+
+    <!--<repository>-->
+    <!--<id>maven.oracle.com</id>-->
+    <!--<releases>-->
+    <!--<enabled>true</enabled>-->
+    <!--</releases>-->
+    <!--<snapshots>-->
+    <!--<enabled>false</enabled>-->
+    <!--</snapshots>-->
+    <!--<url>https://maven.oracle.com</url>-->
+    <!--<layout>default</layout>-->
+    <!--</repository>-->
+    <!--    <repository>-->
+    <!--      <id>dev-iesl.cs.umass.edu-thirdparty</id>-->
+    <!--      <name>dev-iesl.cs.umass.edu</name>-->
+    <!--      <url>https://dev-iesl.cs.umass.edu/nexus/content/repositories/thirdparty/</url>-->
+    <!--    </repository>-->
+    <!--    <repository>-->
+    <!--      <id>dev-iesl.cs.umass.edu-snapshots</id>-->
+    <!--      <name>dev-iesl.cs.umass.edu</name>-->
+    <!--      <url>https://dev-iesl.cs.umass.edu/nexus/content/repositories/snapshots</url>-->
+    <!--    </repository>-->
+    <!--    <repository>-->
+    <!--      <id>dev-iesl.cs.umass.edu-releases</id>-->
+    <!--      <name>dev-iesl.cs.umass.edu</name>-->
+    <!--      <url>https://dev-iesl.cs.umass.edu/nexus/content/repositories/releases</url>-->
+    <!--    </repository>-->
+
+    <repository>
+      <id>cppexport</id>
+      <name>factorie-nlp-latest</name>
+      <url>https://dl.bintray.com/cppexpert/maven/</url>
+    </repository>
+
+    <repository>
+      <id>iesl-snapshots</id>
+      <name>iesl-snapshots</name>
+      <url>https://dev-iesl.cs.umass.edu/nexus/content/groups/public-snapshots/</url>
+    </repository>
+
+    <!--    <repository>-->
+    <!--      <id>dp-artifactory-main</id>-->
+    <!--      <name>ip-172-31-9-93.us-west-2.compute.internal-releases</name>-->
+    <!--      <url>http://172.31.9.93:8081/artifactory/maven-staging-local</url>-->
+    <!--    </repository>-->
+
+    <!--    <repository>-->
+    <!--      <id>info-bliki-repository</id>-->
+    <!--      <url>http://gwtwiki.googlecode.com/svn/maven-repository/</url>-->
+    <!--      &lt;!&ndash;<releases>&ndash;&gt;-->
+    <!--      &lt;!&ndash;<enabled>true</enabled>&ndash;&gt;-->
+    <!--      &lt;!&ndash;</releases>&ndash;&gt;-->
+    <!--      &lt;!&ndash;<snapshots>&ndash;&gt;-->
+    <!--      &lt;!&ndash;<enabled>false</enabled>&ndash;&gt;-->
+    <!--      &lt;!&ndash;</snapshots>&ndash;&gt;-->
+    <!--    </repository>-->
+
+<!--    <repository>-->
+<!--      <id>datapassports-central</id>-->
+<!--      <name>datapassports-central</name>-->
+<!--      <url>${nexus.url}/repository/maven-central/</url>-->
+<!--      <releases>-->
+<!--        <enabled>true</enabled>-->
+<!--      </releases>-->
+<!--      <snapshots>-->
+<!--        <enabled>false</enabled>-->
+<!--      </snapshots>-->
+<!--    </repository>-->
+
+<!--    <repository>-->
+<!--      <id>datapassports-releases</id>-->
+<!--      <name>datapassports-releases</name>-->
+<!--      <url>${nexus.url}/repository/maven-releases/</url>-->
+<!--      <releases>-->
+<!--        <enabled>true</enabled>-->
+<!--      </releases>-->
+<!--      <snapshots>-->
+<!--        <enabled>false</enabled>-->
+<!--      </snapshots>-->
+<!--    </repository>-->
+
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>maven.oracle.com</id>
+      <url>https://maven.oracle.com</url>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <dependencyManagement>
     <dependencies>
-        <!-- Scala lang, spark core and spark sql are all
-             scoped as provided as spark-submit will provide these -->
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>${scala.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_${scala.compat.version}</artifactId>
-            <version>${spark.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql_${scala.compat.version}</artifactId>
-            <version>${spark.version}</version>
-            <scope>provided</scope>
-        </dependency>
-	    <!-- https://mvnrepository.com/artifact/org.webjars/jquery -->
-<dependency>
-    <groupId>org.webjars</groupId>
-    <artifactId>jquery</artifactId>
-    <version>3.5.1</version>
-</dependency>
 
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.25</version>
-        </dependency>
-        <dependency>
-            <groupId>org.clapper</groupId>
-            <artifactId>grizzled-slf4j_${scala.compat.version}</artifactId>
-            <version>1.3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.typesafe</groupId>
-            <artifactId>config</artifactId>
-            <version>1.4.0</version>
-        </dependency>
-        <!-- Test Scopes -->
-        <dependency>
-            <groupId>org.scalactic</groupId>
-            <artifactId>scalactic_${scala.compat.version}</artifactId>
-            <version>3.3.0-SNAP2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_${scala.compat.version}</artifactId>
-            <version>3.0.5</version>
-            <scope>test</scope>
-        </dependency>
+      <dependency>
+        <groupId>com.tribbloids.spookystuff</groupId>
+        <artifactId>spookystuff</artifactId>
+        <version>${spookystuff.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>com.tribbloids.spookystuff</groupId>
+        <artifactId>spookystuff-mldsl</artifactId>
+        <version>${spookystuff.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.tribbloids.spookystuff</groupId>
+        <artifactId>spookystuff-mldsl</artifactId>
+        <version>${spookystuff.version}</version>
+        <type>test-jar</type>
+      </dependency>
+
+      <dependency>
+        <groupId>com.tribbloids.spookystuff</groupId>
+        <artifactId>spookystuff-core</artifactId>
+        <version>${spookystuff.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.tribbloids.spookystuff</groupId>
+        <artifactId>spookystuff-core</artifactId>
+        <version>${spookystuff.version}</version>
+        <type>test-jar</type>
+      </dependency>
+
+      <!--factorie 1.1.x & 1.2.x use snappy-java 1.1.1.3, latest version/hadoop dependency is 1.1.2.6-->
+      <dependency>
+        <groupId>org.xerial.snappy</groupId>
+        <artifactId>snappy-java</artifactId>
+        <version>1.1.2.6</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.jcraft</groupId>
+        <artifactId>jsch</artifactId>
+        <version>0.1.54</version>
+      </dependency>
+
     </dependencies>
-    <build>
-        <sourceDirectory>src/main/scala</sourceDirectory>
-	<testSourceDirectory>src/test/scala</testSourceDirectory>
-        <plugins>
-		        <plugin>
-          <groupId>org.owasp</groupId>
-          <artifactId>dependency-check-maven</artifactId>
-          <version>${dependency-check-maven.version}</version>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-compiler</artifactId>
+      <version>${scala.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+      <version>${scala.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-reflect</artifactId>
+      <version>${scala.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.scalatest</groupId>
+      <artifactId>scalatest_${scala.binary.version}</artifactId>
+      <version>3.0.8</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.scalacheck/scalacheck -->
+    <dependency>
+      <groupId>org.scalacheck</groupId>
+      <artifactId>scalacheck_${scala.binary.version}</artifactId>
+      <version>1.13.5</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.scalamock</groupId>
+      <artifactId>scalamock_${scala.binary.version}</artifactId>
+      <version>4.4.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!--TODO: useless??-->
+    <dependency>
+      <groupId>org.apache.sshd</groupId>
+      <artifactId>sshd-sftp</artifactId>
+      <version>0.9.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-streaming_${scala.binary.version}</artifactId>
+      <version>${spark.version}</version>
+      <scope>${spark.scope}</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-sql-kafka-0-10 -->
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-sql-kafka-0-10_${scala.binary.version}</artifactId>
+      <version>${spark.version}</version>
+      <scope>${spark.scope}</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-mllib_${scala.binary.version}</artifactId>
+      <version>${spark.version}</version>
+      <scope>${spark.scope}</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-hive_${scala.binary.version}</artifactId>
+      <version>${spark.version}</version>
+      <scope>${spark.scope}</scope>
+    </dependency>
+    <!--for unit test only-->
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-yarn_${scala.binary.version}</artifactId>
+      <version>${spark.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!--    TODO: conflicting with HUDI-->
+    <!--    <dependency>-->
+    <!--      <groupId>org.apache.spark</groupId>-->
+    <!--      <artifactId>spark-avro_${scala.binary.version}</artifactId>-->
+    <!--      <version>${spark.version}</version>-->
+    <!--    </dependency>-->
+
+    <!--    <dependency>-->
+    <!--      <groupId>com.databricks</groupId>-->
+    <!--      <artifactId>spark-avro_${scala.binary.version}</artifactId>-->
+    <!--      <version>4.0.0</version>-->
+    <!--    </dependency>-->
+
+    <!--    put in parent to avoid repeat-->
+    <dependency>
+      <groupId>com.tribbloids.spookystuff</groupId>
+      <artifactId>spookystuff-mldsl</artifactId>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.tribbloids.spookystuff</groupId>
+      <artifactId>spookystuff-core</artifactId>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+
+
+    <!-- this version is consisent with spark env -->
+    <!--    <dependency>-->
+    <!--      <groupId>org.apache.avro</groupId>-->
+    <!--      <artifactId>avro</artifactId>-->
+    <!--      <version>1.7.7</version>-->
+    <!--    </dependency>-->
+
+    <dependency>
+      <groupId>org.apache.hudi</groupId>
+      <artifactId>hudi-spark</artifactId>
+      <version>0.5.1_${scala.binary.version}-SNAPSHOT</version>
+      <!--      <exclusions>-->
+      <!--        <exclusion>-->
+      <!--          <artifactId>jets3t</artifactId>-->
+      <!--          <groupId>net.java.dev.jets3t</groupId>-->
+      <!--        </exclusion>-->
+      <!--      </exclusions>-->
+    </dependency>
+    <dependency>
+      <groupId>com.esotericsoftware</groupId>
+      <artifactId>kryo-shaded</artifactId>
+      <version>4.0.2</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.parquet/parquet-avro -->
+    <!--    DON'T DELETE! hudi 4.6/4.7 defaults to parquet-avro 1.6.0 which cased conflict-->
+    <!--   TODO: should auto-resolve-->
+    <dependency>
+      <groupId>org.apache.parquet</groupId>
+      <artifactId>parquet-avro</artifactId>
+      <version>1.10.1</version>
+      <!--      <exclusions>-->
+      <!--        <exclusion>-->
+      <!--          <artifactId>parquet-column</artifactId>-->
+      <!--          <groupId>org.apache.parquet</groupId>-->
+      <!--        </exclusion>-->
+      <!--        <exclusion>-->
+      <!--          <artifactId>parquet-hadoop</artifactId>-->
+      <!--          <groupId>org.apache.parquet</groupId>-->
+      <!--        </exclusion>-->
+      <!--      </exclusions>-->
+    </dependency>
+
+
+    <!--    <dependency>-->
+    <!--      <groupId>com.googlecode.java-diff-utils</groupId>-->
+    <!--      <artifactId>diffutils</artifactId>-->
+    <!--      <version>1.3.0</version>-->
+    <!--      <scope>test</scope>-->
+    <!--    </dependency>-->
+
+
+    <!--for unit/integration tests-->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>1.4.197</version>
+      <scope>provided</scope>
+    </dependency>
+    <!--    <dependency>
+          <groupId>com.sap.db.ngdbc</groupId>
+          <artifactId>ngdbc</artifactId>
+          <version>1.0.0</version>
+          <scope>provided</scope>
+        </dependency>-->
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.1.38</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.microsoft.sqlserver</groupId>
+      <artifactId>sqljdbc4</artifactId>
+      <version>1.0.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>9.4.1211</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/oracle/ojdbc6 -->
+    <dependency>
+      <groupId>oracle</groupId>
+      <artifactId>ojdbc6</artifactId>
+      <version>11.2.0.4</version>
+      <scope>provided</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.ibm.db2.jcc/db2jcc4 -->
+    <dependency>
+      <groupId>com.ibm.db2.jcc</groupId>
+      <artifactId>db2jcc4</artifactId>
+      <version>11.1</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!--<dependency>-->
+    <!--<groupId>oracle</groupId>-->
+    <!--<artifactId>ojdbc7</artifactId>-->
+    <!--<version>12.1.0.1</version>-->
+    <!--<scope>provided</scope>-->
+    <!--</dependency>-->
+
+
+    <dependency>
+      <groupId>${hive.group}</groupId>
+      <artifactId>hive-jdbc</artifactId>
+      <version>${hive.version}</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>${hive.group}</groupId>
+          <artifactId>hive-service</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.cloudera.hive</groupId>
+      <artifactId>hivejdbc41</artifactId>
+      <version>1.0.0</version>
+      <scope>provided</scope>
+    </dependency>
+
+
+    <dependency>
+      <groupId>com.ibm.crypto</groupId>
+      <artifactId>ibmjceprovider</artifactId>
+      <version>${ibmjce.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.ibm.crypto</groupId>
+      <artifactId>ibmjcefips</artifactId>
+      <version>${ibmjce.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.ibm.crypto</groupId>
+      <artifactId>ibmpkcs</artifactId>
+      <version>${ibmjce.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.ibm.crypto</groupId>
+      <artifactId>ibmpkcs11impl</artifactId>
+      <version>${ibmjce.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <outputDirectory>target/scala/classes</outputDirectory>
+    <testOutputDirectory>target/scala/test-classes</testOutputDirectory>
+
+    <pluginManagement>
+      <plugins>
+
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>1.5.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.0.2</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>3.1.0</version>
           <executions>
             <execution>
+              <id>dist</id>
+              <phase>package</phase>
               <goals>
-                <goal>check</goal>
+                <goal>single</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${project.build.directory}/${assembly.jar.dir}</outputDirectory>
+                <descriptors>
+                  <descriptor>${assembly.file}</descriptor>
+                </descriptors>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-shade-plugin</artifactId>
+          <version>3.1.0</version>
+
+          <configuration>
+            <outputFile>${project.build.directory}/${assembly.jar.dir}/${staging.jar.basename}</outputFile>
+            <filters>
+              <filter>
+                <artifact>*:*</artifact>
+                <excludes>
+
+                  <exclude>resources/grib1</exclude>
+                  <exclude>resources/grib2</exclude>
+                  <exclude>resources/nj22</exclude>
+                  <exclude>resources/nasa</exclude>
+                  <exclude>resources/wmo</exclude>
+
+                  <exclude>thredds</exclude>
+
+                  <exclude>META-INF/*.SF</exclude>
+                  <exclude>META-INF/*.DSA</exclude>
+                  <exclude>META-INF/*.RSA</exclude>
+
+                  <!--these are for eclipse jgit-->
+                  <exclude>META-INF/*._SF</exclude>
+                  <exclude>META-INF/*._DSA</exclude>
+                  <exclude>META-INF/*._RSA</exclude>
+
+                  <!--<exclude>javax/servlet/**</exclude>-->
+                </excludes>
+              </filter>
+            </filters>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>2.5.2</version>
+          <!--          <configuration>-->
+          <!--            <createChecksum>true</createChecksum>-->
+          <!--          </configuration>-->
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>2.8.2</version>
+        </plugin>
+        <!--<plugin>-->
+        <!--<groupId>org.sonatype.plugins</groupId>-->
+        <!--<artifactId>nexus-staging-maven-plugin</artifactId>-->
+        <!--<version>1.6.6</version>-->
+        <!--</plugin>-->
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>3.0.2</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>3.1.0</version>
+          <configuration>
+            <attach>true</attach>
+          </configuration>
+          <executions>
+            <execution>
+              <id>attach-sources</id>
+              <goals>
+                <goal>jar-no-fork</goal>
               </goals>
             </execution>
           </executions>
         </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>3.1.1</version>
+          <configuration>
+            <attach>true</attach>
+            <validateLinks>false</validateLinks>
+          </configuration>
+        </plugin>
+
       </plugins>
-            <plugin>
-                <!-- see http://davidb.github.com/scala-maven-plugin -->
-                <groupId>net.alchim31.maven</groupId>
-                <artifactId>scala-maven-plugin</artifactId>
-                <version>3.3.1</version>
-                    <configuration>
-                        <compilerPlugins>
-                            <compilerPlugin>
-                                <groupId>com.artima.supersafe</groupId>
-                                <artifactId>supersafe_${scala.version}</artifactId>
-                                <version>1.1.3</version>
-                            </compilerPlugin>
-                        </compilerPlugins>
-                    </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>compile</goal>
-                            <goal>testCompile</goal>
-                        </goals>
-                        <configuration>
-                            <args>
-                                <arg>-feature</arg>
-                                <arg>-deprecation</arg>
-                                <arg>-dependencyfile</arg>
-                                <arg>${project.build.directory}/.scala_dependencies</arg>
-                            </args>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-	    <!-- enable scalatest -->
-	    <plugin>
-                <groupId>org.scalatest</groupId>
-                <artifactId>scalatest-maven-plugin</artifactId>
-                <version>2.0.0</version>
-                <configuration>
-			<reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
-			<suites>net.martinprobson.spark.SparkTest</suites>
-			<junitxml>.</junitxml>
-			<filereports>WDF TestSuite.txt</filereports>
-		</configuration>
-		<executions>
-			<execution>
-				<id>test</id>
-				<goals>
-					<goal>test</goal>
-				</goals>
-			</execution>
-		</executions>
-	    </plugin>
-	    <!-- disable surefire -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.18.1</version>
-                <configuration>
-		    <skipTests>true</skipTests>
-                    <useFile>false</useFile>
-                    <disableXmlReport>true</disableXmlReport>
-                    <includes>
-                        <include>**/*Test.*</include>
-                        <include>**/*Suite.*</include>
-                    </includes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.5.0</version>
-                <executions>
-                    <execution>
-                        <id>run-local</id>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>spark-submit</executable>
-                            <arguments>
-                                <argument>--master</argument>
-                                <argument>local</argument>
-                                <argument>${project.build.directory}/${project.artifactId}-${project.version}.jar
-                                </argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>run-yarn</id>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <environmentVariables>
-                                <HADOOP_CONF_DIR>
-                                    ${basedir}/spark-remote/conf
-                                </HADOOP_CONF_DIR>
-                            </environmentVariables>
-                            <executable>spark-submit</executable>
-                            <arguments>
-                                <argument>--master</argument>
-                                <argument>yarn</argument>
-                                <argument>${project.build.directory}/${project.artifactId}-${project.version}.jar
-                                </argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- Use the shade plugin to remove all the provided artifacts (such as spark itself) from the jar -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.1.1</version>
-                <configuration>
-                    <!-- Remove signed keys to prevent security exceptions on uber jar -->
-                    <!-- See https://stackoverflow.com/a/6743609/7245239 -->
-                    <filters>
-                        <filter>
-                            <artifact>*:*</artifact>
-                            <excludes>
-                                <exclude>META-INF/*.SF</exclude>
-                                <exclude>META-INF/*.DSA</exclude>
-                                <exclude>META-INF/*.RSA</exclude>
-                            </excludes>
-                        </filter>
-                    </filters>
-                    <transformers>
-                        <transformer
-                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                            <mainClass>net.martinprobson.spark.SparkTest</mainClass>
-                        </transformer>
-                    </transformers>
-                    <artifactSet>
-                        <excludes>
-                            <exclude>javax.servlet:*</exclude>
-                            <exclude>org.apache.hadoop:*</exclude>
-                            <exclude>org.apache.maven.plugins:*</exclude>
-                            <exclude>org.apache.spark:*</exclude>
-                            <exclude>org.apache.avro:*</exclude>
-                            <exclude>org.apache.parquet:*</exclude>
-                            <exclude>org.scala-lang:*</exclude>
-                        </excludes>
-                    </artifactSet>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+    </pluginManagement>
+
+    <plugins>
+
+      <plugin>
+        <groupId>org.codehaus.gmaven</groupId>
+        <artifactId>groovy-maven-plugin</artifactId>
+        <version>2.0</version>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <source>
+                log.warn('project basedir: {}', '${project.basedir}')
+                log.warn('platform: {}', '${platform.suffix}')
+              </source>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
+        <version>1.0.1</version>
+        <executions>
+          <!-- enable flattening -->
+          <execution>
+            <id>flatten</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>flatten</goal>
+            </goals>
+          </execution>
+          <!-- ensure proper cleanup -->
+          <execution>
+            <id>flatten.clean</id>
+            <phase>clean</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+          </execution>
+        </executions>
+
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.12</version>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${project.basedir}/src/shim${platform.suffix}/main/scala</source>
+                <source>${project.basedir}/src/gen/java</source>
+              </sources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>add-test-source</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>add-test-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${project.basedir}/src/shim${platform.suffix}/test/scala</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>scala-maven-plugin</artifactId>
+        <version>3.3.1</version>
+        <executions>
+          <execution>
+            <id>scala-compile-first</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>scala-test-compile-first</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>testCompile</goal>
+            </goals>
+          </execution>
+          <!--required for publishing to maven central-->
+          <execution>
+            <id>eclipse-add-source</id>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+          </execution>
+          <!--          <execution>-->
+          <!--            <id>attach-scaladocs</id>-->
+          <!--            <phase>verify</phase>-->
+          <!--            <goals>-->
+          <!--              <goal>doc-jar</goal>-->
+          <!--            </goals>-->
+          <!--          </execution>-->
+        </executions>
+        <configuration>
+          <scalaVersion>${scala.version}</scalaVersion>
+          <scalaCompatVersion>${scala.binary.version}</scalaCompatVersion>
+          <recompileMode>incremental</recompileMode>
+          <useZincServer>true</useZincServer>
+          <!--https://tpolecat.github.io/2017/04/25/scalac-flags.html-->
+          <args>
+            <arg>-target:jvm-${java.version}</arg>
+            <arg>-unchecked</arg>
+            <arg>-deprecation</arg>
+            <arg>-feature</arg>
+            <arg>-g:vars</arg>
+            <!--<arg>-language:existentials</arg> &lt;!&ndash; often used in project &ndash;&gt;-->
+
+            <arg>-encoding</arg>
+            <arg>UTF-8</arg>
+            <!--<arg>-language:_</arg>-->
+            <!--<arg>-Xfatal-warnings</arg>-->
+            <arg>-Xlint</arg>
+            <!--<arg>-Yno-adapted-args</arg>-->
+            <!--<arg>-Ywarn-dead-code</arg> &lt;!&ndash;,        // N.B. doesn't work well with the ??? hole &ndash;&gt;-->
+            <!--<arg>-Ywarn-numeric-widen</arg>-->
+            <!--<arg>-Ywarn-value-discard</arg>-->
+            <!--<arg>-Xfuture</arg>-->
+            <arg>-Ywarn-unused-import</arg>
+            <arg>-Ypartial-unification</arg>
+            <!--<arg>-Ylog-classpath</arg>-->
+            <!--<arg>-Ywarn-numeric-widen</arg>        &lt;!&ndash;      // Warn when numerics are widened. &ndash;&gt;-->
+            <!--<arg>-language:higherKinds</arg>-->
+            <!--<arg>-P:wartremover:only-warn-traverser:org.wartremover.warts.Unsafe</arg>-->
+          </args>
+          <!--<jvmArgs>-->
+          <!--<jvmArg>-Xms64m</jvmArg>-->
+          <!--<jvmArg>-Xms1024m</jvmArg>-->
+          <!--<jvmArg>-Xmx1024m</jvmArg>-->
+          <!--</jvmArgs>-->
+          <javacArgs>
+            <javacArg>-source</javacArg>
+            <javacArg>${java.version}</javacArg>
+            <javacArg>-target</javacArg>
+            <javacArg>${java.version}</javacArg>
+          </javacArgs>
+
+          <excludes>
+            <exclude>**/.ipynb_checkpoints/*</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.5.1</version>
+        <configuration>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+
+          <excludes>
+            <exclude>**/.ipynb_checkpoints/*</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.scalatest</groupId>
+        <artifactId>scalatest-maven-plugin</artifactId>
+        <version>2.0.0</version>
+        <configuration>
+          <reportsDirectory>${project.build.directory}</reportsDirectory>
+          <filereports>WDF TestSuite.txt</filereports>
+          <tagsToExclude>
+            com.schedule1.datapassports.testutils.Spike,
+            com.schedule1.datapassports.testutils.Unstable,
+            com.schedule1.datapassports.testutils.LocalOnly,
+            com.schedule1.datapassports.testutils.NeedBlockChain,
+            com.schedule1.datapassports.testutils.NeedOracle,
+            com.schedule1.datapassports.testutils.NeedSQLServer,
+            com.schedule1.datapassports.testutils.NeedMySQL,
+            com.schedule1.datapassports.testutils.NeedKrb,
+            com.schedule1.datapassports.testutils.NeedRemoteHDFS,
+            com.schedule1.datapassports.testutils.NeedRemoteSSH,
+            com.schedule1.datapassports.testutils.NeedCIServer
+          </tagsToExclude>
+        </configuration>
+        <executions>
+          <execution>
+            <id>test</id>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
+        <!--<configuration>-->
+        <!--<forkMode>once</forkMode>-->
+        <!--<systemProperties>-->
+        <!--<spark.master>${spark.master}</spark.master>-->
+        <!--</systemProperties>-->
+        <!--</configuration>-->
+      </plugin>
+
+      <!--<plugin>-->
+      <!--<groupId>org.apache.maven.plugins</groupId>-->
+      <!--<artifactId>maven-surefire-plugin</artifactId>-->
+      <!--<version>2.18.1</version>-->
+      <!--<executions>-->
+      <!--<execution>-->
+      <!--<id>test</id>-->
+      <!--<goals>-->
+      <!--<goal>test</goal>-->
+      <!--</goals>-->
+      <!--</execution>-->
+      <!--</executions>-->
+      <!--<configuration>-->
+      <!--<forkCount>1</forkCount>-->
+      <!--<systemPropertyVariables>-->
+      <!--<spark.master>${spark.master}</spark.master>-->
+      <!--</systemPropertyVariables>-->
+      <!--</configuration>-->
+      <!--</plugin>-->
+
+      <!-- Generate test jar too -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>3.0.0-M2</version>
+        <executions>
+          <execution>
+            <id>enforce-profiles</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireActiveProfile>
+                  <profiles>spark-2.4</profiles>
+                  <all>false</all>
+                </requireActiveProfile>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
+        </executions>
+
+        <!--very important! child pom doesn't inherit profile!-->
+        <inherited>false</inherited>
+      </plugin>
+
+      <plugin>
+        <groupId>pl.project13.maven</groupId>
+        <artifactId>git-commit-id-plugin</artifactId>
+        <version>3.0.1</version>
+        <executions>
+          <execution>
+            <id>get-the-git-infos</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>revision</goal>
+            </goals>
+          </execution>
+
+          <execution>
+            <id>validate-the-git-infos</id>
+            <!-- *NOTE*: The default phase of validateRevision is verify, but in case you want to change it, you can do so by adding the phase here -->
+            <phase>package</phase>
+            <goals>
+              <goal>validateRevision</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+          <generateGitPropertiesFile>true</generateGitPropertiesFile>
+          <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>
